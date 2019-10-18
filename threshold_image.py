@@ -14,15 +14,17 @@ contador = 0
 
 # processa todos os arquivos
 for file in files:
+
+    filename = os.fsdecode(file)
+    # le arquivo original
+    input_filepath = "{}/{}".format(config['TrainPath'], filename)
+
     try:
-        filename = os.fsdecode(file)
+        image = lib.read_image(input_filepath)
     except ValueError:
         lib.error("{} arquivo dicom corrompido: {}".format(contador, file))
         continue
 
-    # le arquivo original
-    input_filepath = "{}/{}".format(config['TrainPath'], filename)
-    image = lib.read_image(input_filepath)
 
     # todo: definir area de interesse com snake
     roi = image
