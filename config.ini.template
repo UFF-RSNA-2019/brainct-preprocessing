@@ -1,0 +1,5 @@
+[Geral]
+# Diretorios
+TrainPath=[Incluir caminho do diretorio com arquivos de treinamento exemplo: /rsna/dataset/stage_1_train_images]
+SegmentationPath=[Incluir caminho do diretorio com arquivos segmentados, exemplo: /rsna/dataset/stage_1_train_images_hemo_vent]
+EpiduralSetFile=[Incluir caminho do arquivo texto com a lista de IDs com epidural, exemplo: /rsna/dataset/sets/epidural.txt]
