@@ -154,7 +154,11 @@ def getRight(imgx):
 
 def log(mensagem):
     now = datetime.datetime.now()
-    print("{} : {}".format(now.strftime("%Y-%m-%d %H:%M:%S.%f"), mensagem), flush=True)
+    print("[INFO] {} : {}".format(now.strftime("%Y-%m-%d %H:%M:%S.%f"), mensagem), flush=True)
+
+def error(mensagem):
+    now = datetime.datetime.now()
+    print("[ERROR] {} : {}".format(now.strftime("%Y-%m-%d %H:%M:%S.%f"), mensagem), flush=True)
 
 def plot(title, image, color_map=plt.cm.bone):
     plt.imshow(image, cmap=color_map)

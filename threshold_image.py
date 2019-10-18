@@ -14,7 +14,11 @@ contador = 0
 
 # processa todos os arquivos
 for file in files:
-    filename = os.fsdecode(file)
+    try:
+        filename = os.fsdecode(file)
+    except ValueError:
+        lib.error("{} arquivo dicom corrompido: {}".format(contador, file))
+        continue
 
     # le arquivo original
     input_filepath = "{}/{}".format(config['TrainPath'], filename)
