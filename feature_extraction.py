@@ -26,6 +26,10 @@ files = os.listdir(folder)
 # 3:
 
 contador = 0
+max_records = 100 # variavel para limitar qtd registros processados
+
+contador = 0
+
 for file in files:
     feature_vector = []
     filename = os.fsdecode(file)
@@ -36,6 +40,15 @@ for file in files:
     except ValueError:
         lib.error("{} arquivo dicom corrompido: {}".format(contador, file))
         continue
+
+    lib.plot("imagem {}".format(contador), image)
+
     # obtem as features
-    feature_vector.append(tem_ventriculo.extract(image))
-    feature_vector.append(qtd_hemorragia.extract(image))
+    feature = tem_ventriculo.extract(image)
+    feature_vector.append(feature)
+    print("imagem {} \n Tem ventriculo: {}".format(contador, feature))
+
+    # feature_vector.append(qtd_hemorragia.extract(image))
+
+    contador += 1
+    if (contador >= max_records): exit()
