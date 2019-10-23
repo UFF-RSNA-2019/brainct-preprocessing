@@ -25,7 +25,6 @@ for file in files:
         lib.error("{} arquivo dicom corrompido: {}".format(contador, file))
         continue
 
-
     # todo: definir area de interesse com snake
     roi = image
 

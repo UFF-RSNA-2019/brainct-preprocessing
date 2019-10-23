@@ -74,6 +74,10 @@ for file in files:
         ventriculo = lib.ventriculo_threshold(roi)
         lib.plot("ventriculo: {} \n {}".format(filename, classification), ventriculo, color_map=plt.cm.tab20)
 
+        # append = np.append(hemorrage, ventriculo)
+        # lib.plot("append: {} \n {}".format(filename, classification), append, color_map=plt.cm.bone)
+
+
         # intersecao
         threshold = hemorrage + ventriculo
 
