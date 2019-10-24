@@ -71,16 +71,17 @@ with open(gt_file_path) as f:
     for row in reader:
         id = row['ID'][:12]
         sample = n_row // 6
-        print("n_row {} sample {}".format(n_row, sample))
-        labels.append(row['Label'])
+        labels.append(int(row['Label']))
         if (n_row % 6) == 0:
             # cacula feature
             features = calcula_features(id)
             if (len(features) > 0):
                 stage1_x.append(features)
                 stage1_y.append(labels)
-                # TODO: Falta gravar os vetores
             labels = []
         n_row += 1
+
+np.savetxt('{}/stage1_x.csv'.format(output_path), stage1_x, fmt='%1.10f', delimiter=',')
+np.savetxt('{}/stage1_y.csv'.format(output_path), stage1_y, fmt='%1.0f', delimiter=',')
 
 print("Done")
