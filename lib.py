@@ -38,26 +38,26 @@ DICOM_MAX=2048
 
 def hemorrage_threshold(image):
     img = image.copy()
-    img[img < HEMORRAGE_MIN] = 0
-    img[img > HEMORRAGE_MAX] = 0
+    img[img < HEMORRAGE_MIN] = DICOM_MIN
+    img[img > HEMORRAGE_MAX] = DICOM_MIN
     return img
 
 def ventriculo_threshold(image):
     img = image.copy()
-    img[img < VENTRICULO_MIN] = 0
-    img[img > VENTRICULO_MAX] = 0
+    img[img < VENTRICULO_MIN] = DICOM_MIN
+    img[img > VENTRICULO_MAX] = DICOM_MIN
     return img
 
 def parenchyma_threshold(image):
     img = image.copy()
-    img[img < PARENCHYMA_MIN] = 0
-    img[img > PARENCHYMA_MAX] = 0
+    img[img < PARENCHYMA_MIN] = DICOM_MIN
+    img[img > PARENCHYMA_MAX] = DICOM_MIN
     return img
 
 def skull_threshold(image):
     img = image.copy()
-    img[img < SKULL_MIN] = 0
-    img[img > SKULL_MAX] = 0
+    img[img < SKULL_MIN] = DICOM_MIN
+    img[img > SKULL_MAX] = DICOM_MIN
     return img
 
 def normalize(image, min, max):
@@ -139,8 +139,8 @@ def get_roi_cabeca(image):
     cv2.drawContours(mask , contornos, -1, 255, -1)
     # new_img = cv2.bitwise_and(image, image, mask=mask)
 
-    # obtem as fronteiras da região
-    # TODO: utilizar uma fronteira com forma do cranio ao inves de bound box.
+    # obtem as fronteiras da região de interesse
+    # TODO: definir fronteira mais anatômica para o ROI ao inves de bound box (testar método snake).
     top = getTop(mask)
     bottom = getBottom(mask)
     left = getLeft(mask)

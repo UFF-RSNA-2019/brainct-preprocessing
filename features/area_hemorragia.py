@@ -16,12 +16,18 @@ def extract(image):
     cnts = cv2.findContours(mask_hemorragia, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
+
     contornos = []
+    media = 0.0
+    numerador = 0.0
+    denominador = 0.0
     for contorno in cnts:
         area = cv2.contourArea(contorno)
         if area > 100: # estruturas com area menor que este valor nao sao consideradas
             # print(area) # debug
             contornos.append(contorno)
+            numerador += area
+            denominador += 1
 
     # debug
     # mask  = np.zeros(image.shape[:2], np.uint8)
@@ -30,16 +36,19 @@ def extract(image):
     # lib.plot("contornos hemorragias", mask) # debug
     # debug
 
-    qtd_hemorragias = len(contornos)
+    if denominador > 0:
+        media = numerador / denominador
+
+    # print("media: {}".format(media)) # debug
 
     # NORMALIZA
-    MIN_HEMORRAGIA = 0.0
-    MAX_HEMORRAGIA = 10.0
-    if qtd_hemorragias > MAX_HEMORRAGIA:
-        qtd_hemorragias = MAX_HEMORRAGIA
+    MIN_MEDIA = 0.0
+    MAX_MEDIA = 1000.0
+    if media > MAX_MEDIA:
+        media = MAX_MEDIA
 
     # normaliza
-    normalized = (qtd_hemorragias - MIN_HEMORRAGIA) / (MAX_HEMORRAGIA - MIN_HEMORRAGIA)
+    normalized = (media - MIN_MEDIA) / (MAX_MEDIA - MIN_MEDIA)
 
     return normalized
 

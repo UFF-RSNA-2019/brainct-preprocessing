@@ -47,7 +47,6 @@ for file in files:
         filepath = "{}/{}".format(input_path, filename)
         image = lib.read_image(filepath)
 
-        # todo: definir area de interesse com snake
         roi = image
         lib.plot("original: {} \n {}".format(filename, classification), image)
 

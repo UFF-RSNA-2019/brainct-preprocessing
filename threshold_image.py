@@ -25,15 +25,16 @@ for file in files:
         lib.error("{} arquivo dicom corrompido: {}".format(contador, file))
         continue
 
-    # todo: definir area de interesse com snake
     roi = image
 
     # limiarizacao
     hemorrage = lib.hemorrage_threshold(roi)
+
     ventriculo = lib.ventriculo_threshold(roi)
 
     # intersecao
     threshold = hemorrage + ventriculo
+    threshold[threshold == (2 * lib.DICOM_MIN)] = lib.DICOM_MIN # anula o efeito da soma dos pixels com área vazia
 
     # normaliza
     normalized = lib.normalize(threshold, lib.VENTRICULO_MIN, lib.HEMORRAGE_MAX)
