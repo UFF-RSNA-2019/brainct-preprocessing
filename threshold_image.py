@@ -1,14 +1,9 @@
 import lib
 import os
 import numpy as np
-import configparser
 
-# inicializacao
-configparser = configparser.ConfigParser()
-configparser.read('config.ini')
-config = configparser['Geral']
-
-files = os.listdir(config['TrainPath'])
+# configuracao
+files = os.listdir(lib.config['TrainPath'])
 
 contador = 0
 
@@ -17,7 +12,7 @@ for file in files:
 
     filename = os.fsdecode(file)
     # le arquivo original
-    input_filepath = "{}/{}".format(config['TrainPath'], filename)
+    input_filepath = "{}/{}".format(lib.config['TrainPath'], filename)
 
     try:
         image = lib.read_image(input_filepath)
@@ -40,19 +35,19 @@ for file in files:
     normalized = lib.normalize(threshold, lib.VENTRICULO_MIN, lib.HEMORRAGE_MAX)
 
     # salva arquivo
-    output_filepath = "{}/{}.npz".format(config['SegmentationPath'], filename[:12])
+    output_filepath = "{}/{}.npz".format(lib.config['SegmentationPath'], filename[:12])
     np.savez_compressed(output_filepath, data=normalized)
     lib.log("{} arquivo: {}".format(contador, output_filepath))
     contador += 1
 
 # faz o flip do epidural
-with open(config['EpiduralSetFile']) as f:
+with open(lib.config['EpiduralSetFile']) as f:
     for line in f:
         id = line[:12]
-        input_epidural_filepath = "{}/{}.npz".format(config['SegmentationPath'], id)
+        input_epidural_filepath = "{}/{}.npz".format(lib.config['SegmentationPath'], id)
         image = np.load(input_epidural_filepath)["data"]
         flipped = np.fliplr(image)
-        output_epidural_filepath = "{}/{}_flip.npz".format(config['SegmentationPath'], id)
+        output_epidural_filepath = "{}/{}_flip.npz".format(lib.config['SegmentationPath'], id)
         np.savez_compressed(output_epidural_filepath, data=flipped)
         lib.log("{} arquivo epidural: {}".format(contador, output_epidural_filepath))
 

@@ -12,7 +12,13 @@ from skimage.filters import threshold_multiotsu
 # inicializacao
 configparser = configparser.ConfigParser()
 configparser.read('config.ini')
-config = configparser['Geral']
+try:
+    config = configparser['Geral']
+except KeyError:
+    now = datetime.datetime.now()
+    msg = "Problema ao obter configuração, verifique se você está rodando o programa no diretório principal do projeto."
+    print("[ERROR] {} : {}".format(now.strftime("%Y-%m-%d %H:%M:%S.%f"), msg), flush=True)
+    sys.exit()
 
 # CONSTANTES
 
@@ -103,6 +109,16 @@ def get_classification(filename):
     return classes
 
 # FUNCOES PARA MANIPULAR DICOM
+
+def obtem_imagem(path, id):
+    input_filepath = "{}/{}.dcm".format(path, id)
+    try:
+        # carrega a imagem a partir do filesystem
+        image = read_image(input_filepath)
+        return image
+    except ValueError:
+        error("arquivo dicom corrompido: {}".format(id))
+        return np.zeros((SIZE, SIZE))
 
 def read_image(filename):
     ds = pydicom.dcmread(filename)
@@ -208,3 +224,29 @@ def plot(title, image, color_map=plt.cm.bone):
     plt.imshow(image, cmap=color_map)
     plt.title(title)
     plt.show()
+
+# FUNCOES PARA TESTE DOS EXTRATORES
+
+def get_train_images():
+    import configparser
+    import os
+    configparser = configparser.ConfigParser()
+    configparser.read('config.ini')
+    config = configparser['Geral']
+    train_path = config['TrainPath']
+    train_folder = os.fsencode(train_path)
+    files = os.listdir(train_folder)
+    imagens = []
+    for file in files:
+        filename = os.fsdecode(file)
+        id = filename[:12]
+        image = obtem_imagem(train_path, id)
+        if (image.any()):
+            imagens.append((id, image))
+    return imagens
+
+def test_extractor(extractor):
+    imagens = get_train_images()
+    for image in imagens:
+        features = extractor(image[1])
+        print("image: {}, feature: {}".format(image[0], features))

@@ -36,3 +36,6 @@ def extract(image):
         return 0
 
 # todo: segmentar crânio e só considerar ventrículo se estiver dentro dele
+
+# test (copy and paste)
+lib.test_extractor(extract)
