@@ -11,7 +11,7 @@ def extract(image):
     ventriculo = lib.ventriculo_threshold(roi)
 
     # verifica as áreas em que encontrou ventriculo
-    mask_ventriculo = np.zeros((lib.SIZE, lib.SIZE)).astype('uint8')
+    mask_ventriculo = np.zeros_like(ventriculo).astype('uint8')
     mask_ventriculo[ventriculo > lib.DICOM_MIN] = 1
     cnts = cv2.findContours(mask_ventriculo, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)

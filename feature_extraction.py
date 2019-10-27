@@ -39,6 +39,10 @@ def extrai_features(image):
 
     return feature_vector
 
+number_append_train = 0
+features_buffer = ""
+labels_buffer = ""
+
 # inclui o resultado da extracao de features nos arquivos
 def append_train(features, labels):
     # salva arquivos csv
@@ -69,7 +73,9 @@ def append_test(features, id):
 # para cada ID do dataset de treinamento gera um registro nos vetores stage1_x e stage1_y
 contador = 0
 with open(gt_file_path) as f:
+    lib.debug("antes de ler o csv de treinamento")
     reader = csv.DictReader(f, delimiter=',')
+    lib.debug("após ler o csv de treinamento")
     n_row=1
     labels = []
     tem_epidural = False
@@ -84,13 +90,13 @@ with open(gt_file_path) as f:
 
         if (n_row % 6) == 0:
         # já concluiu vetor de labels do ID agora pode extrair as features
+            lib.log("train image {}, {}".format(id, contador))
             image = lib.obtem_imagem(train_path, id)
             if (image.any()):
                 features = extrai_features(image)
                 if (len(features) > 0):
                     append_train(features, labels)
                     contador += 1
-                    print("train image {}, {}, feature:{}".format(id, contador, features))
                 # se for epidural aumenta os dados de treinamento com imagem espelhada
                 if (tem_epidural):
                     image = np.fliplr(image)
@@ -98,7 +104,6 @@ with open(gt_file_path) as f:
                     if (len(features) > 0):
                         append_train(features, labels)
                         contador += 1
-                        print("train image flipped_epid, {}, feature:{}".format(contador, features))
 
             labels = []
             tem_epidural = False
@@ -110,6 +115,7 @@ contador = 0
 test_folder = os.fsencode(test_path)
 files = os.listdir(test_folder)
 for file in files:
+    lib.log("test image {}, {}".format(id, contador))
     filename = os.fsdecode(file)
     id = filename[:12]
     image = lib.obtem_imagem(test_path, id)
@@ -118,6 +124,5 @@ for file in files:
         if (len(features) > 0):
             append_test(features, id)
             contador += 1
-            print("test image {}, {}, feature:{}".format(id, contador, features))
 
 print("Done")

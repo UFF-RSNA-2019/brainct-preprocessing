@@ -11,7 +11,7 @@ def extract(image):
     hemorragia = lib.hemorrage_threshold(roi)
 
     # verifica as áreas em que encontrou hemorragia
-    mask_hemorragia = np.zeros((lib.SIZE, lib.SIZE)).astype('uint8')
+    mask_hemorragia = np.zeros_like(hemorragia).astype('uint8')
     mask_hemorragia[hemorragia > lib.DICOM_MIN] = 1
     cnts = cv2.findContours(mask_hemorragia, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)

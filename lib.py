@@ -22,7 +22,7 @@ except KeyError:
 
 # CONSTANTES
 
-SIZE = 512
+DEFAULT_SIZE = 512
 
 HEMORRAGE_MIN=65
 HEMORRAGE_MAX=95
@@ -118,7 +118,7 @@ def obtem_imagem(path, id):
         return image
     except ValueError:
         error("arquivo dicom corrompido: {}".format(id))
-        return np.zeros((SIZE, SIZE))
+        return np.zeros((DEFAULT_SIZE, DEFAULT_SIZE))
 
 def read_image(filename):
     ds = pydicom.dcmread(filename)
@@ -136,6 +136,8 @@ def update_dicom(path_original, path_alterado, data):
 # FUNCOES PARA DEFINIR REGIAO DE INTERESSE
 
 def get_roi_cabeca(image):
+    # temporariamente desativada pois esta muito ineficiente
+    return image
 
     # segmenta os ossos e outros objetos com maior densidade da imagem
     colorized, otsu, thresholds = multiotsu(image, 3)
@@ -170,17 +172,6 @@ def get_roi_cabeca(image):
     roi[:, right:SIZE] = DICOM_MIN
 
     return roi
-
-def define_roi(imagem, mascara):
-    left   = getLeft(mascara)
-    right  = getRight(mascara)
-    top    = getTop(mascara)
-    bottom = getBottom(mascara)
-    imagem[:left,:] = 0
-    imagem[right:,:] = 0
-    imagem[:,:top] = 0
-    imagem[:,bottom:] = 0
-    return imagem
 
 def getTop(img):
     h, w = img.shape
@@ -219,6 +210,11 @@ def log(mensagem):
 def error(mensagem):
     now = datetime.datetime.now()
     print("[ERROR] {} : {}".format(now.strftime("%Y-%m-%d %H:%M:%S.%f"), mensagem), flush=True)
+
+def debug(mensagem):
+    now = datetime.datetime.now()
+    print("[DEBUG] {} : {}".format(now.strftime("%Y-%m-%d %H:%M:%S.%f"), mensagem), flush=True)
+
 
 def plot(title, image, color_map=plt.cm.bone):
     plt.imshow(image, cmap=color_map)
