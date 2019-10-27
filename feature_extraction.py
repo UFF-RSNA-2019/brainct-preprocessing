@@ -39,17 +39,33 @@ def extrai_features(image):
 
     return feature_vector
 
+# inclui o resultado da extracao de features nos arquivos
+def append_train(features, labels):
+    # salva arquivos csv
+    # features
+    features_str = ",".join(['{:1.10f}'.format(x) for x in features])
+    with open("{}/{}".format(output_path, "stage1_x.csv"), "a") as resultado_file:
+        resultado_file.write("{}\n".format(features_str))
+
+    # labels
+    labels_str = ",".join([str(x) for x in labels])
+    with open("{}/{}".format(output_path, "stage1_y.csv"), "a") as resultado_file:
+        resultado_file.write("{}\n".format(labels_str))
+
+def append_test(features, id):
+    # salva arquivos csv
+    # features
+    features_str = ",".join(['{:1.10f}'.format(x) for x in features])
+    with open("{}/{}".format(output_path, "stage1_test_x.csv"), "a") as resultado_file:
+        resultado_file.write("{}\n".format(features_str))
+
+    # ID
+    with open("{}/{}".format(output_path, "stage1_test_id.csv"), "a") as resultado_file:
+        resultado_file.write("{}\n".format(id))
+
 # PROCESSAMENTO PRINCIPAL
 
-# 1. define os vetores de features e labels que serão gerados
-# vetores de entrada para o treinamento do SKlearn
-stage1_x = []  # features
-stage1_y = []  # labels
-# vetor de teste e vetor com respectivos ids para serem usados posteriormente na predição/submissão
-stage1_test_id = []
-stage1_test_x = []
-
-# 2. processa os dados de treinamento
+# 1. processa os dados de treinamento
 # para cada ID do dataset de treinamento gera um registro nos vetores stage1_x e stage1_y
 contador = 0
 with open(gt_file_path) as f:
@@ -72,26 +88,21 @@ with open(gt_file_path) as f:
             if (image.any()):
                 features = extrai_features(image)
                 if (len(features) > 0):
-                    stage1_x.append(features)
-                    stage1_y.append(labels)
+                    append_train(features, labels)
                     contador += 1
                     print("train image {}, {}, feature:{}".format(id, contador, features))
                 # se for epidural aumenta os dados de treinamento com imagem espelhada
                 if (tem_epidural):
                     image = np.fliplr(image)
-                    features = extrai_features('flipped_epid', image)
+                    features = extrai_features(image)
                     if (len(features) > 0):
-                        stage1_x.append(features)
-                        stage1_y.append(labels)
+                        append_train(features, labels)
                         contador += 1
                         print("train image flipped_epid, {}, feature:{}".format(contador, features))
 
             labels = []
             tem_epidural = False
         n_row += 1
-# salva arquivos csv
-np.savetxt('{}/stage1_x.csv'.format(output_path), stage1_x, fmt='%1.10f', delimiter=',')
-np.savetxt('{}/stage1_y.csv'.format(output_path), stage1_y, fmt='%1.0f', delimiter=',')
 
 # 2. processa os dados de teste
 # para cada ID do arquivo de teste gera um registro nos vetores stage1_test_x e no stage1_test_id
@@ -105,12 +116,8 @@ for file in files:
     if (image.any()):
         features = extrai_features(image)
         if (len(features) > 0):
-            stage1_test_x.append(features)
-            stage1_test_id.append(id)
+            append_test(features, id)
             contador += 1
             print("test image {}, {}, feature:{}".format(id, contador, features))
-# salva arquivos csv
-np.savetxt('{}/stage1_test_x.csv'.format(output_path), stage1_test_x, fmt='%1.10f', delimiter=',')
-np.savetxt('{}/stage1_test_id.csv'.format(output_path), stage1_test_id, fmt='%s', delimiter=',')
 
 print("Done")

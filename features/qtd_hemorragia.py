@@ -45,5 +45,3 @@ def extract(image):
 
 # todo: segmentar crânio e só considerar hemorragias dentro dele
 
-# test (copy and paste)
-lib.test_extractor(extract)
