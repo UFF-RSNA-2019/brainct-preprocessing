@@ -240,9 +240,3 @@ def get_train_images():
         if (image.any()):
             imagens.append((id, image))
     return imagens
-
-def test_extractor(extractor):
-    imagens = get_train_images()
-    for image in imagens:
-        features = extractor(image[1])
-        print("image: {}, feature: {}".format(image[0], features))

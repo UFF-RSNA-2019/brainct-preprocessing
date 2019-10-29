@@ -4,9 +4,9 @@ import configparser
 import csv
 import numpy as np
 
-from features import tem_ventriculo
-from features import qtd_hemorragia
-from features import area_hemorragia
+import feature_tem_ventriculo
+import feature_qtd_hemorragia
+import feature_area_hemorragia
 
 # Programa que extrai caracteristicas de imagens DICOM com tomografias de cranio e coloca em arquivo texto
 # estes arquivos tem por finalidade serem processados por métodos como: KNN, XGBoost, MLP e RandomForest.
@@ -27,13 +27,13 @@ def extrai_features(image):
     feature_vector = []
 
     # 1. verifica se tem ventriculo
-    feature_vector.append(tem_ventriculo.extract(image))
+    feature_vector.append(feature_tem_ventriculo.extract(image))
 
     # 2. quantidade de hemorragias
-    feature_vector.append(qtd_hemorragia.extract(image))
+    feature_vector.append(feature_qtd_hemorragia.extract(image))
 
     # 3. área média da hemorragia
-    feature_vector.append(area_hemorragia.extract(image))
+    feature_vector.append(feature_area_hemorragia.extract(image))
 
     # 4. distancia média da hemorragia para o osso (osso mais perto)
 

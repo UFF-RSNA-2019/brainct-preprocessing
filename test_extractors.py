@@ -1,8 +1,21 @@
-from features import tem_ventriculo
-from features import qtd_hemorragia
-from features import area_hemorragia
+import feature_tem_ventriculo
+import feature_qtd_hemorragia
+import feature_area_hemorragia
 import lib
 
-lib.test_extractor(tem_ventriculo.extract())
-lib.test_extractor(qtd_hemorragia.extract())
-lib.test_extractor(area_hemorragia.extract())
+# gera vetor de features a partir de todas as features criadas
+def extrai_features(image):
+    feature_vector = []
+    # 1. verifica se tem ventriculo
+    feature_vector.append(feature_tem_ventriculo.extract(image))
+    # 2. quantidade de hemorragias
+    feature_vector.append(feature_qtd_hemorragia.extract(image))
+    # 3. área média da hemorragia
+    feature_vector.append(feature_area_hemorragia.extract(image))
+    # 4. distancia média da hemorragia para o osso (osso mais perto)
+    return feature_vector
+
+imagens = lib.get_train_images()
+for image in imagens:
+    features = extrai_features(image[1])
+    print("image: {}, features: {}".format(image[0], features))

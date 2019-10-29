@@ -76,7 +76,6 @@ for file in files:
         # append = np.append(hemorrage, ventriculo)
         # lib.plot("append: {} \n {}".format(filename, classification), append, color_map=plt.cm.bone)
 
-
         # intersecao
         threshold = hemorrage + ventriculo
 
