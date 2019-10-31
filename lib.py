@@ -221,6 +221,12 @@ def plot(title, image, color_map=plt.cm.bone):
     plt.title(title)
     plt.show()
 
+
+def show(imagem):
+    cv2.imshow("uff", imagem)
+    cv2.waitKey(0)
+
+
 # FUNCOES PARA TESTE DOS EXTRATORES
 
 def get_train_images():

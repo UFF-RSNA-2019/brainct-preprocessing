@@ -1,26 +1,15 @@
+from keras.applications import VGG16
 import lib
-import os
-import configparser
 import csv
+import os
 import numpy as np
 
 import feature_tem_ventriculo
 import feature_qtd_hemorragia
 import feature_area_hemorragia
 
-# Programa que extrai caracteristicas de imagens DICOM com tomografias de cranio e coloca em arquivo texto
-# estes arquivos tem por finalidade serem processados por métodos como: KNN, XGBoost, MLP e RandomForest.
-# Será utilizada saída multiclass (SKLearn contempla saída multilabel para os classificadores acima).
-# referencia:http://scikit.ml/index.html
-#            https://xang1234.github.io/multi-label/
-#            https://github.com/scikit-multilearn/scikit-multilearn
-
-# configuracao
-gt_file_path = lib.config['GroundTruth']
-train_path = lib.config['TrainPath']
-test_path = lib.config['TestPath']
+test_path = lib.config["TestPath"]
 output_path = lib.config['FeaturesPath']
-
 
 # gera vetor de features a partir de todas as features criadas
 def extrai_features(image):
@@ -36,12 +25,6 @@ def extrai_features(image):
     feature_vector.append(feature_area_hemorragia.extract(image))
 
     # 4. distancia média da hemorragia para o osso (osso mais perto)
-
-    return feature_vector
-
-number_append_train = 0
-features_buffer = ""
-labels_buffer = ""
 
 # inclui o resultado da extracao de features nos arquivos
 def append_train(features, labels):
@@ -67,7 +50,14 @@ def append_test(features, id):
     with open("{}/{}".format(output_path, "stage1_test_id.csv"), "a") as resultado_file:
         resultado_file.write("{}\n".format(id))
 
-# PROCESSAMENTO PRINCIPAL
+train_path = lib.config["TrainPath"]
+
+conv_base = VGG16(weights='imagenet',
+                  include_top=False)
+features = np.zeros(shape=(12, 512, 512, 1))
+labels = np.zeros(shape=(12))
+
+gt_file_path = lib.config['GroundTruth']
 
 # 1. processa os dados de treinamento
 # para cada ID do dataset de treinamento gera um registro nos vetores stage1_x e stage1_y
@@ -90,37 +80,42 @@ with open(gt_file_path) as f:
         # já concluiu vetor de labels do ID agora pode extrair as features
             lib.log("train image {}, {}".format(id, contador))
             image = lib.obtem_imagem(train_path, id)
-            if (image.any()):
-                features = extrai_features(image)
-                if (len(features) > 0):
-                    append_train(features, labels)
-                    contador += 1
-                # se for epidural aumenta os dados de treinamento com imagem espelhada
-                if (tem_epidural):
-                    image = np.fliplr(image)
-                    features = extrai_features(image)
-                    if (len(features) > 0):
-                        append_train(features, labels)
+            if (image.any() and image.shape == (512, 512)):
+                try:
+                    features_batch = conv_base.predict(image)
+                    features_manual = extrai_features(image)
+                    if (len(features_manual) > 0):
+                        append_train(features_manual, labels)
                         contador += 1
+                    # se for epidural aumenta os dados de treinamento com imagem espelhada
+                    if (tem_epidural):
+                        image = np.fliplr(image)
+                        features_manual = extrai_features(image)
+                        if (len(features_manual) > 0):
+                            append_train(features_manual, labels)
+                            contador += 1
+                except Exception as e:
+                    print(str(e))
+
 
             labels = []
             tem_epidural = False
         n_row += 1
 
-# 2. processa os dados de teste
-# para cada ID do arquivo de teste gera um registro nos vetores stage1_test_x e no stage1_test_id
-contador = 0
-test_folder = os.fsencode(test_path)
-files = os.listdir(test_folder)
-for file in files:
-    lib.log("test image {}, {}".format(id, contador))
-    filename = os.fsdecode(file)
-    id = filename[:12]
-    image = lib.obtem_imagem(test_path, id)
-    if (image.any()):
-        features = extrai_features(image)
-        if (len(features) > 0):
-            append_test(features, id)
-            contador += 1
+# # 2. processa os dados de teste
+# # para cada ID do arquivo de teste gera um registro nos vetores stage1_test_x e no stage1_test_id
+# contador = 0
+# test_folder = os.fsencode(test_path)
+# files = os.listdir(test_folder)
+# for file in files:
+#     lib.log("test image {}, {}".format(id, contador))
+#     filename = os.fsdecode(file)
+#     id = filename[:12]
+#     image = lib.obtem_imagem(test_path, id)
+#     if (image.any()):
+#         features_manual = extrai_features(image)
+#         if (len(features_manual) > 0):
+#             append_test(features_manual, id)
+#             contador += 1
 
 print("Done")

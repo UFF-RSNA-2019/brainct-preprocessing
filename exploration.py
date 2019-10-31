@@ -47,8 +47,12 @@ for file in files:
         filepath = "{}/{}".format(input_path, filename)
         image = lib.read_image(filepath)
 
+
         roi = image
         lib.plot("original: {} \n {}".format(filename, classification), image)
+
+        lib.show(image)
+
 
         # segmentacao via limiarizacao
 

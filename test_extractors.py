@@ -19,3 +19,5 @@ imagens = lib.get_train_images()
 for image in imagens:
     features = extrai_features(image[1])
     print("image: {}, features: {}".format(image[0], features))
+
+
