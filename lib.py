@@ -88,7 +88,7 @@ def histogram(image, remove_min=False):
 
 # obtem classificacao de um elemento dos dados de treinamento
 def get_classification(filename):
-    train_file = "{}/stage_1_train.csv".format(config['TrainPath'])
+    train_file = config['GroundTruth']
     classes = np.zeros(6)
     id = filename[:12]
     try:
@@ -132,74 +132,6 @@ def update_dicom(path_original, path_alterado, data):
     ds.PixelData = data.tostring()
     ds.Rows, ds.Columns = data.shape
     ds.save_as(path_alterado)
-
-# FUNCOES PARA DEFINIR REGIAO DE INTERESSE
-
-def get_roi_cabeca(image):
-    # temporariamente desativada pois esta muito ineficiente
-    return image
-
-    # segmenta os ossos e outros objetos com maior densidade da imagem
-    colorized, otsu, thresholds = multiotsu(image, 3)
-    mask_ossos = np.zeros((SIZE, SIZE)).astype('uint8')
-    mask_ossos[otsu == 2] = 1
-
-    #obtem contornos para excluir estruturas densas fora do cranio
-    cnts = cv2.findContours(mask_ossos, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cnts = imutils.grab_contours(cnts)
-    cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
-    contornos = []
-    for contorno in cnts:
-        area = cv2.contourArea(contorno)
-        if area > 100: # estruturas com area menor que este valor nao sao consideradas
-            contornos.append(contorno)
-    mask  = np.zeros(image.shape[:2], np.uint8)
-    cv2.drawContours(mask , contornos, -1, 255, -1)
-    # new_img = cv2.bitwise_and(image, image, mask=mask)
-
-    # obtem as fronteiras da região de interesse
-    # TODO: definir fronteira mais anatômica para o ROI ao inves de bound box (testar método snake).
-    top = getTop(mask)
-    bottom = getBottom(mask)
-    left = getLeft(mask)
-    right = getRight(mask)
-    # cv2.rectangle(image, (left, top), (right, bottom), (255, 0, 0), 2)
-    # faz o recorte do retangulo englobando a cabeça
-    roi = image
-    roi[:top,:] = DICOM_MIN
-    roi[bottom:SIZE, :] = DICOM_MIN
-    roi[:, :left] = DICOM_MIN
-    roi[:, right:SIZE] = DICOM_MIN
-
-    return roi
-
-def getTop(img):
-    h, w = img.shape
-    for i in range(h-1):
-        for j in range(w-1):
-            if img[i,j] > 0:
-                return i
-
-def getBottom(img):
-    h, w = img.shape
-    for i in range(h-1, 0, -1):
-        for j in range(w):
-            if img[i,j] > 0:
-                return i
-
-def getLeft(imgx):
-    h, w = imgx.shape
-    for j in range(w-1):
-        for i in range(h-1):
-            if imgx[i,j] > 0:
-                return j
-
-def getRight(imgx):
-    h, w = imgx.shape
-    for j in range(w-1, 0, -1):
-        for i in range(h-1, 0, -1):
-            if imgx[i,j] > 0:
-                return j
 
 # FUNCOES UTILITARIAS
 
