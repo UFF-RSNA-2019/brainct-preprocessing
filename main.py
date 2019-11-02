@@ -1,6 +1,5 @@
 import lib
 import os
-import configparser
 import csv
 import numpy as np
 import segmentation
@@ -98,7 +97,7 @@ if __name__ == "__main__":
                             feat = extrai_features(image)
                             if (len(feat) > 0):
                                 append_train(feat, labels)
-                        # TODO: salva imagem segmentada
+                        # TODO: salvar imagem segmentada para treinamento de uma CNN
                     labels = []
                     e_epidural = False
             n_row += 1
